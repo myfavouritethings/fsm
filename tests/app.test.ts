@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { App } from '../src/app';
+import { encodeShareLink } from '../src/share/urlShare';
 
 // Mock ResizeObserver
 class MockResizeObserver {
@@ -15,8 +16,9 @@ describe('App Shell Controller', () => {
   beforeEach(() => {
     localStorage.clear();
     vi.stubGlobal('ResizeObserver', MockResizeObserver);
+    let uuidCount = 0;
     vi.stubGlobal('crypto', {
-      randomUUID: () => 'app-test-uuid',
+      randomUUID: () => `app-test-uuid-${uuidCount++}`,
     });
     vi.stubGlobal('confirm', vi.fn(() => true));
     vi.stubGlobal('URL', {
@@ -28,6 +30,15 @@ describe('App Shell Controller', () => {
         writeText: vi.fn(() => Promise.resolve()),
       },
     });
+
+    const mockAnchor = { href: '', download: '', style: {}, click: vi.fn() };
+    const origCreate = document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      if (tagName === 'a') return mockAnchor as any;
+      return origCreate.call(document, tagName);
+    });
+    vi.spyOn(document.body, 'appendChild').mockImplementation((el: any) => el);
+    vi.spyOn(document.body, 'removeChild').mockImplementation((el: any) => el);
 
     root = document.createElement('div');
     root.id = 'app-root';
@@ -55,7 +66,8 @@ describe('App Shell Controller', () => {
       // Compress value: `#s=CoCwpgBA5gdsQA` or similar. Let's encode a real one
       // We can use urlShare helper, or manually build:
       // Let's set hash manually
-      window.location.hash = '#s=CoCwpgBAhgLglgYwDYHMBOBnEA'; // represents empty FSM with name
+      const hash = encodeShareLink('URL Shared', { nodes: [], links: [] }).split('#')[1];
+      window.location.hash = '#' + hash;
       app = new App(root);
 
       const items = root.querySelectorAll('.machine-item');
@@ -220,6 +232,7 @@ describe('App Shell Controller', () => {
 
       const copyBtn = root.querySelector<HTMLButtonElement>('#copy-share')!;
       copyBtn.click();
+      await new Promise(r => setTimeout(r, 0));
 
       expect(navigator.clipboard.writeText).toHaveBeenCalled();
       expect(root.querySelector('#status')?.textContent).toBe('Share link copied to clipboard.');
@@ -262,6 +275,7 @@ describe('App Shell Controller', () => {
         },
       });
       const file = new File([validImportJson], 'fsm.json', { type: 'application/json' });
+      file.text = () => Promise.resolve(validImportJson);
 
       // Mock HTMLInputElement files property
       Object.defineProperty(importInput, 'files', {
@@ -284,6 +298,7 @@ describe('App Shell Controller', () => {
 
       const importInput = root.querySelector<HTMLInputElement>('#import-json-input')!;
       const file = new File(['{corrupt'], 'corrupt.json', { type: 'application/json' });
+      file.text = () => Promise.resolve('{corrupt');
 
       Object.defineProperty(importInput, 'files', {
         value: [file],

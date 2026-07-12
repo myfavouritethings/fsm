@@ -23,7 +23,7 @@ describe('Export utilities', () => {
       latex.beginPath();
       latex.arc(100, 200, 30, 0, Math.PI * 2);
       const output = latex.toLaTeX();
-      expect(output).toContain('\\draw [black] (10, -20) circle (3);\n');
+      expect(output).toContain('\\draw [black] (10,-20) circle (3);\n');
     });
 
     it('draws a partial arc under different angle parameters', () => {
@@ -55,7 +55,7 @@ describe('Export utilities', () => {
       latex.lineTo(30, 40);
       latex.stroke();
 
-      expect(latex.toLaTeX()).toContain('\\draw [black] (1, -2) -- (3, -4);\n');
+      expect(latex.toLaTeX()).toContain('\\draw [black] (1,-2) -- (3,-4);\n');
 
       const latexFill = new ExportAsLaTeX();
       latexFill.beginPath();
@@ -63,7 +63,7 @@ describe('Export utilities', () => {
       latexFill.lineTo(30, 40);
       latexFill.fill();
 
-      expect(latexFill.toLaTeX()).toContain('\\fill [black] (1, -2) -- (3, -4);\n');
+      expect(latexFill.toLaTeX()).toContain('\\fill [black] (1,-2) -- (3,-4);\n');
     });
 
     it('ignores stroke and fill calls when points are empty', () => {
@@ -91,7 +91,7 @@ describe('Export utilities', () => {
       latex.measureText = () => ({ width: 40 } as TextMetrics);
 
       // Empty text shouldn't output anything
-      latex.advancedFillText('   ', '   ', 100, 200, null);
+      latex.advancedFillText('', '', 100, 200, null);
       expect(latex.toLaTeX()).not.toContain('\\draw');
 
       // Normal text, no angle
@@ -195,7 +195,7 @@ describe('Export utilities', () => {
 
       // Empty text is ignored
       const svgEmpty = new ExportAsSVG();
-      svgEmpty.fillText('   ', 100, 200);
+      svgEmpty.fillText('', 100, 200);
       expect(svgEmpty.toSVG(800, 600)).not.toContain('<text');
     });
 
@@ -238,9 +238,10 @@ describe('Export utilities', () => {
         style: {},
         click: vi.fn(),
       };
+      const origCreate = document.createElement;
       vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
         if (tagName === 'a') return mockAnchor as any;
-        return document.createElement.prototype.constructor.call(document, tagName);
+        return origCreate.call(document, tagName);
       });
       vi.spyOn(document.body, 'appendChild').mockImplementation(() => ({} as any));
       vi.spyOn(document.body, 'removeChild').mockImplementation(() => ({} as any));
@@ -370,7 +371,7 @@ describe('Export utilities', () => {
           if (tagName === 'textarea') return mockTextarea as any;
           return origCreate.call(document, tagName);
         });
-        vi.spyOn(document, 'execCommand').mockImplementation(() => true);
+        document.execCommand = vi.fn(() => true);
 
         await copyToClipboard('fallback copy');
 

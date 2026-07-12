@@ -201,12 +201,12 @@ describe('drawing helpers', () => {
         'adv',
         100,
         200,
-        0.5,
+        null,
         false,
         false
       );
 
-      expect(c.advancedFillText).toHaveBeenCalledWith('adv', 'adv', 100, 200, 0.5);
+      expect(c.advancedFillText).toHaveBeenCalledWith('adv', 'adv', 100, 200, null);
       // It should not call fillText
       expect(c.calls.some(call => call.name === 'fillText')).toBe(false);
     });

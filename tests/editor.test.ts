@@ -29,6 +29,21 @@ describe('FSMEditor', () => {
       toJSON: () => {},
     });
 
+    canvas.getContext = vi.fn(() => ({
+      measureText: vi.fn(() => ({ width: 10 })),
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
+      fill: vi.fn(),
+      fillText: vi.fn(),
+      translate: vi.fn(),
+      save: vi.fn(),
+      restore: vi.fn(),
+      clearRect: vi.fn(),
+    })) as any;
+
     onChangeSpy = vi.fn();
     onSelectionChangeSpy = vi.fn();
 
@@ -240,11 +255,11 @@ describe('FSMEditor', () => {
       const md = new MouseEvent('mousedown', { clientX: 100, clientY: 100 });
       canvas.dispatchEvent(md);
 
-      const mm = new MouseEvent('mousemove', { clientX: 100, clientY: 70 });
+      const mm = new MouseEvent('mousemove', { clientX: 100, clientY: 80 });
       canvas.dispatchEvent(mm);
       expect(editor.currentLink).toBeInstanceOf(SelfLink);
 
-      const mu = new MouseEvent('mouseup', { clientX: 100, clientY: 70 });
+      const mu = new MouseEvent('mouseup', { clientX: 100, clientY: 80 });
       canvas.dispatchEvent(mu);
 
       expect(editor.links).toHaveLength(1);

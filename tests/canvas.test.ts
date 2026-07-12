@@ -14,6 +14,8 @@ class MockResizeObserver {
   disconnect = vi.fn();
 }
 
+global.PointerEvent = class extends MouseEvent {} as any;
+
 describe('CanvasViewport', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -134,8 +136,8 @@ describe('CanvasViewport', () => {
       heightInput.value = '900';
 
       applyBtn.click();
-      // Should remain DEFAULT_CANVAS_SIZE
-      expect(canvas.width).toBe(DEFAULT_CANVAS_SIZE.width);
+      // Should clamp 0 to MIN_WIDTH (400)
+      expect(canvas.width).toBe(400);
     });
 
     it('toggles fullscreen state when clicked', async () => {
@@ -153,7 +155,7 @@ describe('CanvasViewport', () => {
         value: shell,
         configurable: true,
       });
-      shell.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      document.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
 
       expect(fullscreenBtn.textContent).toBe('Exit fullscreen');
 
@@ -166,7 +168,7 @@ describe('CanvasViewport', () => {
         value: null,
         configurable: true,
       });
-      shell.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      document.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
       expect(fullscreenBtn.textContent).toBe('Fullscreen');
     });
 
@@ -178,7 +180,7 @@ describe('CanvasViewport', () => {
         value: shell,
         configurable: true,
       });
-      shell.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      document.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
 
       // shell clientWidth = 900. paddingX = 20 => width = 880
       // shell clientHeight = 700. paddingY = 20, toolbar = 40, extra 8 => height = 632
