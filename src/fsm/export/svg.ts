@@ -87,7 +87,7 @@ export class ExportAsSVG implements DrawContext {
   }
 
   measureText(text: string, canvas?: HTMLCanvasElement): TextMetrics {
-    const c = canvas?.getContext('2d');
+    const c = (canvas || document.createElement('canvas')).getContext('2d');
     if (!c) throw new Error('Canvas required for text measurement');
     c.font = '20px "Times New Roman", serif';
     return c.measureText(text);

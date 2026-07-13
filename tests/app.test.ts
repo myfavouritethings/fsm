@@ -290,7 +290,7 @@ describe('App Shell Controller', () => {
       await new Promise(resolve => setTimeout(resolve, 50));
 
       expect(root.querySelector('#status')?.textContent).toBe('Imported "Imported Success" as a new machine.');
-      expect(root.querySelector('#machine-name')?.getAttribute('value')).toBe('Imported Success');
+      expect(root.querySelector<HTMLInputElement>('#machine-name')?.value).toBe('Imported Success');
     });
 
     it('handles corrupted JSON import errors gracefully', async () => {

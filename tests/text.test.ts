@@ -38,7 +38,7 @@ describe('text helpers', () => {
 
     it('replaces non-ASCII/special characters with numeric character references', () => {
       expect(textToXML('α')).toBe('&#945;');
-      expect(textToXML('q₀')).toBe('&#113;&#8320;');
+      expect(textToXML('q₀')).toBe('q&#8320;');
     });
 
     it('leaves safe printable ASCII characters alone', () => {

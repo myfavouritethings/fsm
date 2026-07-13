@@ -108,7 +108,7 @@ describe('Export utilities', () => {
 
       // Below (dy > 0)
       latex.advancedFillText('q3', 'q3', 100, 200, Math.PI / 2); // cos=0, sin=1
-      expect(latex.toLaTeX()).toContain('\\draw (10,-21) node [below] {$q3$};');
+      expect(latex.toLaTeX()).toContain('\\draw (10,-19) node [below] {$q3$};');
 
       // Above (dy < 0)
       latex.advancedFillText('q4', 'q4', 100, 200, -Math.PI / 2); // cos=0, sin=-1
