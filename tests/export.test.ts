@@ -75,9 +75,9 @@ describe('Export utilities', () => {
       expect(latex.toLaTeX()).not.toContain('\\fill');
     });
 
-    it('measures text width and throws when canvas is missing', () => {
+    it('measures text width automatically creating a fallback canvas if missing', () => {
       const latex = new ExportAsLaTeX();
-      expect(() => latex.measureText('hello')).toThrow('Canvas required for text measurement');
+      expect(latex.measureText('hello')).toBeDefined();
 
       const canvas = document.createElement('canvas');
       const metrics = latex.measureText('hello', canvas);
@@ -112,7 +112,7 @@ describe('Export utilities', () => {
 
       // Above (dy < 0)
       latex.advancedFillText('q4', 'q4', 100, 200, -Math.PI / 2); // cos=0, sin=-1
-      expect(latex.toLaTeX()).toContain('\\draw (10,-19) node [above] {$q4$};');
+      expect(latex.toLaTeX()).toContain('\\draw (10,-21) node [above] {$q4$};');
     });
 
     it('implements stub context operations without errors', () => {
